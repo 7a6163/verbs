@@ -1,0 +1,9 @@
+{
+  "firebase": "irregular-verbs",
+  "public": ".",
+  "ignore": [
+    "firebase.json",
+    ".*",
+    "**/node_modules/**"
+  ]
+}

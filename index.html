@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>不規則動詞試卷產生機</title>
+
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+  <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+  <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+  <![endif]-->
+
+  <!-- Firebase -->
+  <script src="https://cdn.firebase.com/js/client/1.0.15/firebase.js"></script>
+  <!-- AngularJS -->
+  <!-- <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.6/angular.min.js"></script> -->
+  <!-- AngularFire Library -->
+  <!-- <script src="https://cdn.firebase.com/libs/angularfire/0.7.1/angularfire.min.js"></script> -->
+
+  <!-- Latest compiled and minified JavaScript -->
+  <!-- <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script> -->
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/mustache.js/0.8.1/mustache.min.js"></script>
+</head>
+<body>
+
+  <!-- <label><input type="checkbox" value="base" /> Base</label>
+  <label><input type="checkbox" value="past" /> Past</label>
+  <label><input type="checkbox" value="pp" /> PP</label>
+  <label><input type="checkbox" value="chinese" /> Chinese</label> -->
+<div class="container">
+  <div class="table-responsive">
+  <table class="table table-striped visible-print-block">
+    <thead>
+      <tr>
+        <th class="col-sm-2">#</th>
+        <th>Base</th>
+        <th>Past</th>
+        <th>PP</th>
+        <th class="col-sm-2">Chinese</th>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
+</div>
+</div>
+  <script>
+
+  var listRef = new Firebase('https://irregular-verbs.firebaseio.com/');
+  listRef.on('value', function(snapshot) {
+    var msgData = snapshot.val();
+
+    var shuffled = _.shuffle(msgData);
+    var data = { 'data': shuffled };
+
+
+    var template =
+    '{{#data}}' +
+    '<tr><td><label>{{base}}</label></td><td></td><td></td><td></td><td></td></tr>' +
+    '{{/data}}';
+
+    var render = Mustache.render(template, data);
+    $('table tbody').append(render);
+  });
+
+  </script>
+</body>
+</html>
