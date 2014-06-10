@@ -8,6 +8,52 @@
 
   <!-- Latest compiled and minified CSS -->
   <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+
+  <style>
+  @media print {
+
+    .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12 {
+      float: left;
+    }
+    .col-sm-12 {
+      width: 100%;
+    }
+    .col-sm-11 {
+      width: 91.66666666666666%;
+    }
+    .col-sm-10 {
+      width: 83.33333333333334%;
+    }
+    .col-sm-9 {
+      width: 75%;
+    }
+    .col-sm-8 {
+      width: 66.66666666666666%;
+    }
+    .col-sm-7 {
+      width: 58.333333333333336%;
+    }
+    .col-sm-6 {
+      width: 50%;
+    }
+    .col-sm-5 {
+      width: 41.66666666666667%;
+    }
+    .col-sm-4 {
+      width: 33.33333333333333%;
+    }
+    .col-sm-3 {
+      width: 25%;
+    }
+    .col-sm-2 {
+      width: 16.666666666666664%;
+    }
+    .col-sm-1 {
+      width: 8.333333333333332%;
+    }
+
+  }
+  </style>
   <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
   <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
   <!--[if lt IE 9]>
@@ -25,9 +71,10 @@
   <!-- Latest compiled and minified JavaScript -->
   <!-- <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script> -->
 
-<script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/mustache.js/0.8.1/mustache.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/mustache.js/0.8.1/mustache.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/json3/3.3.1/json3.min.js"></script>
 </head>
 <body>
 
@@ -35,40 +82,102 @@
   <label><input type="checkbox" value="past" /> Past</label>
   <label><input type="checkbox" value="pp" /> PP</label>
   <label><input type="checkbox" value="chinese" /> Chinese</label> -->
-<div class="container">
-  <div class="table-responsive">
-  <table class="table table-striped visible-print-block">
-    <thead>
-      <tr>
-        <th class="col-sm-2">#</th>
-        <th>Base</th>
-        <th>Past</th>
-        <th>PP</th>
-        <th class="col-sm-2">Chinese</th>
-      </tr>
-    </thead>
-    <tbody>
-    </tbody>
-  </table>
-</div>
-</div>
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-6">
+        <table id="tableOdd" class="table table-striped table-bordered table-condensed">
+          <thead>
+            <tr>
+              <th class="col-sm-1">#</th>
+              <th class="col-sm-3">Base</th>
+              <th class="col-sm-3">Past</th>
+              <th class="col-sm-3">PP</th>
+              <th class="col-sm-1">Chinese</th>
+            </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+      </div>
+      <div class="col-sm-6">
+        <table id="tableEven" class="table table-striped table-bordered table-condensed">
+          <thead>
+            <tr>
+              <th class="col-sm-1">#</th>
+              <th class="col-sm-3">Base</th>
+              <th class="col-sm-3">Past</th>
+              <th class="col-sm-3">PP</th>
+              <th class="col-sm-1">Chinese</th>
+            </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
   <script>
 
-  var listRef = new Firebase('https://irregular-verbs.firebaseio.com/');
-  listRef.on('value', function(snapshot) {
-    var msgData = snapshot.val();
+
+  function pickRandomProperty(obj) {
+    var result;
+    var count = 0;
+    for (var prop in obj)
+    if (Math.random() < 1/++count)
+    result = obj[prop];
+    return result;
+  }
+
+  function getAllData() {
+    var listRef = new Firebase('https://irregular-verbs.firebaseio.com/');
+    listRef.on('value', function(snapshot) {
+      window.localStorage["verbs"] = JSON.stringify(snapshot.val());
+    });
+  }
+
+  $(function () {
+
+    var verbs = window.localStorage["verbs"];
+
+    if(_.isUndefined(verbs)) {
+      getAllData();
+    }
+    var msgData = JSON.parse(verbs);
 
     var shuffled = _.shuffle(msgData);
-    var data = { 'data': shuffled };
 
+    var list = _.map(shuffled, function(obj){
+      return result = { 'random' : pickRandomProperty(obj) };
+    });
 
-    var template =
-    '{{#data}}' +
-    '<tr><td><label>{{base}}</label></td><td></td><td></td><td></td><td></td></tr>' +
-    '{{/data}}';
+    var rest = _.rest(list, 39);
+    var partition =_.partition(rest, function (obj){
+      return list.indexOf(obj) % 2 === 0;
+    });
 
-    var render = Mustache.render(template, data);
-    $('table tbody').append(render);
+    var data = {
+      'dataOdd': partition[0],
+      'dataEven': partition[1]
+    };
+
+    var templateOdd =
+    '{{#dataOdd}}' +
+    '<tr>' +
+    '<td>{{random}}<label></label></td><td></td><td></td><td></td><td></td>' +
+    '</tr>' +
+    '{{/dataOdd}}';
+
+    var templateEven =
+    '{{#dataEven}}' +
+    '<tr>' +
+    '<td>{{random}}<label></label></td><td></td><td></td><td></td><td></td>' +
+    '</tr>' +
+    '{{/dataEven}}';
+
+    var renderOdd = Mustache.render(templateOdd, data);
+    $('#tableOdd tbody').append(renderOdd);
+    var renderEven = Mustache.render(templateEven, data);
+    $('#tableEven tbody').append(renderEven);
   });
 
   </script>
